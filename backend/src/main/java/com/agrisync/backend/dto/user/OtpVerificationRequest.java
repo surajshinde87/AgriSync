@@ -1,6 +1,7 @@
 package com.agrisync.backend.dto.user;
 
-import com.agrisync.backend.model.OtpType;
+import com.agrisync.backend.enums.OtpType;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

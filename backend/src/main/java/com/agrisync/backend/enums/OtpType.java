@@ -1,4 +1,4 @@
-package com.agrisync.backend.model;
+package com.agrisync.backend.enums;
 
 public enum OtpType {
     REGISTRATION,

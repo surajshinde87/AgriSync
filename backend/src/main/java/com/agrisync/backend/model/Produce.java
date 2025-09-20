@@ -17,7 +17,10 @@ public class Produce {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long farmerId; // FK to User
+ @ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "farmer_id", nullable = false)
+private User farmer;
+
 
     @Column(nullable = false)
     private String cropType;

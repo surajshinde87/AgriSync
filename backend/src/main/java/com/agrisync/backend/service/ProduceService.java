@@ -3,7 +3,9 @@ package com.agrisync.backend.service;
 import com.agrisync.backend.dto.farmer.ProduceRequest;
 import com.agrisync.backend.dto.farmer.ProduceResponse;
 import com.agrisync.backend.model.Produce;
+import com.agrisync.backend.model.User;
 import com.agrisync.backend.repository.ProduceRepository;
+import com.agrisync.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,8 @@ import java.util.stream.Collectors;
 public class ProduceService {
 
     private final ProduceRepository produceRepository;
-    private final GithubImageService githubImageService; // we created this for uploads
+    private final UserRepository userRepository;       // Added
+    private final GithubImageService githubImageService;
 
     public ProduceResponse createProduce(Long farmerId, ProduceRequest request) {
         String photoUrl = request.getPhotoUrl();
@@ -29,8 +32,12 @@ public class ProduceService {
             );
         }
 
+        // fetch User entity
+        User farmer = userRepository.findById(farmerId)
+                .orElseThrow(() -> new RuntimeException("Farmer not found"));
+
         Produce produce = Produce.builder()
-                .farmerId(farmerId)
+                .farmer(farmer) // link User entity
                 .cropType(request.getCropType())
                 .quantityKg(request.getQuantityKg())
                 .pricePerKg(request.getPricePerKg())
@@ -50,7 +57,7 @@ public class ProduceService {
     }
 
     public List<ProduceResponse> getFarmerProduces(Long farmerId) {
-        return produceRepository.findByFarmerIdAndActiveTrue(farmerId)
+        return produceRepository.findByFarmer_IdAndActiveTrue(farmerId) // updated
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -77,7 +84,7 @@ public class ProduceService {
         if (request.getPhotoFile() != null && !request.getPhotoFile().isEmpty()) {
             produce.setPhotoUrl(githubImageService.uploadImage(
                     request.getPhotoFile(),
-                    "produce_" + produce.getFarmerId() + "_" + System.currentTimeMillis() + ".jpg"
+                    "produce_" + produce.getFarmer().getId() + "_" + System.currentTimeMillis() + ".jpg"
             ));
         } else if (request.getPhotoUrl() != null) {
             produce.setPhotoUrl(request.getPhotoUrl());

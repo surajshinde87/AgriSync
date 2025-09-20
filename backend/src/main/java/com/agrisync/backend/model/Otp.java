@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.agrisync.backend.enums.OtpType;
+
 @Entity
 @Table(name = "otps")
 @Data

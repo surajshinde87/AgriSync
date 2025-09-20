@@ -8,5 +8,10 @@ import java.util.List;
 
 @Repository
 public interface ProduceRepository extends JpaRepository<Produce, Long> {
-    List<Produce> findByFarmerIdAndActiveTrue(Long farmerId);
+
+    // Find all active produces for a farmer
+    List<Produce> findByFarmer_IdAndActiveTrue(Long farmerId);
+
+    // Optional: find all produces by status
+    List<Produce> findByFarmer_IdAndStatus(Long farmerId, String status);
 }
