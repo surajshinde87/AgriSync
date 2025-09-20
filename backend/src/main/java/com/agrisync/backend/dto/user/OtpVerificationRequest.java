@@ -1,4 +1,4 @@
-package com.agrisync.backend.dto;
+package com.agrisync.backend.dto.user;
 
 import com.agrisync.backend.model.OtpType;
 import jakarta.validation.constraints.Email;

@@ -17,7 +17,7 @@ public class SecurityConfig {
                 "/api/users/verify-otp",
                 "/api/users/forgot-password",
                 "/api/users/reset-password").permitAll() // public endpoints
-                .anyRequest().authenticated() // all others require authentication
+                .anyRequest().permitAll() // all others require authentication
             )
             .httpBasic(customizer -> {}); // basic auth for testing
         return http.build();

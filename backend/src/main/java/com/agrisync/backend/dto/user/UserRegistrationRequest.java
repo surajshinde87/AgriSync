@@ -1,4 +1,4 @@
-package com.agrisync.backend.dto;
+package com.agrisync.backend.dto.user;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;

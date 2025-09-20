@@ -1,6 +1,11 @@
 package com.agrisync.backend.controller;
 
-import com.agrisync.backend.dto.*;
+
+import com.agrisync.backend.dto.user.ForgotPasswordRequest;
+import com.agrisync.backend.dto.user.LoginRequest;
+import com.agrisync.backend.dto.user.OtpVerificationRequest;
+import com.agrisync.backend.dto.user.ResetPasswordRequest;
+import com.agrisync.backend.dto.user.UserRegistrationRequest;
 import com.agrisync.backend.model.User;
 import com.agrisync.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
