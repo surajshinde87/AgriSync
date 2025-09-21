@@ -1,6 +1,6 @@
 package com.agrisync.backend.controller;
 
-import com.agrisync.backend.dto.farmer.BidResponse;
+import com.agrisync.backend.dto.bid.BidResponse;
 import com.agrisync.backend.model.Bid;
 import com.agrisync.backend.service.BidService;
 import lombok.RequiredArgsConstructor;

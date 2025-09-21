@@ -1,7 +1,7 @@
 package com.agrisync.backend.controller;
 
-import com.agrisync.backend.dto.farmer.ProduceRequest;
-import com.agrisync.backend.dto.farmer.ProduceResponse;
+import com.agrisync.backend.dto.produce.ProduceRequest;
+import com.agrisync.backend.dto.produce.ProduceResponse;
 import com.agrisync.backend.service.ProduceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

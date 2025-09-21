@@ -1,6 +1,6 @@
 package com.agrisync.backend.service;
 
-import com.agrisync.backend.dto.farmer.BidResponse;
+import com.agrisync.backend.dto.bid.BidResponse;
 import com.agrisync.backend.enums.BidStatus;
 import com.agrisync.backend.model.Bid;
 import com.agrisync.backend.model.Produce;

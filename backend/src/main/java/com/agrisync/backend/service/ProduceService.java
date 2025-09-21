@@ -1,7 +1,7 @@
 package com.agrisync.backend.service;
 
-import com.agrisync.backend.dto.farmer.ProduceRequest;
-import com.agrisync.backend.dto.farmer.ProduceResponse;
+import com.agrisync.backend.dto.produce.ProduceRequest;
+import com.agrisync.backend.dto.produce.ProduceResponse;
 import com.agrisync.backend.model.Produce;
 import com.agrisync.backend.model.User;
 import com.agrisync.backend.repository.ProduceRepository;

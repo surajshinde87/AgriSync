@@ -1,9 +1,8 @@
-package com.agrisync.backend.dto.farmer;
+package com.agrisync.backend.dto.bid;
 
 import lombok.*;
 import java.time.LocalDateTime;
 
-import com.agrisync.backend.model.User;
 
 @Data
 @Builder

@@ -1,7 +1,6 @@
-package com.agrisync.backend.dto.farmer;
+package com.agrisync.backend.dto.produce;
 
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -9,13 +8,15 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProduceRequest {
+public class ProduceResponse {
+    private Long id;
     private String cropType;
     private Double quantityKg;
     private Double pricePerKg;
     private LocalDate harvestDate;
     private String city;
     private String state;
-    private MultipartFile photoFile; // optional for upload
-    private String photoUrl;         // optional if already uploaded
+    private String photoUrl;
+    private String qualityGrade;
+    private String status;
 }
