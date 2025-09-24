@@ -12,39 +12,28 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/farmer/bids")
 @RequiredArgsConstructor
-public class BidController {
+public class FarmerBidController {
 
     private final BidService bidService;
 
     // ================= List all bids for a farmer =================
     @GetMapping
     public ResponseEntity<List<BidResponse>> getFarmerBids(@RequestParam Long farmerId) {
-        List<BidResponse> bids = bidService.getFarmerBidsDTO(farmerId);
-        return ResponseEntity.ok(bids);
+        return ResponseEntity.ok(bidService.getFarmerBidsDTO(farmerId));
     }
 
     // ================= Accept a bid =================
     @PostMapping("/{bidId}/accept")
     public ResponseEntity<BidResponse> acceptBid(@PathVariable Long bidId) {
         Bid bid = bidService.acceptBid(bidId);
-        BidResponse response = mapToResponse(bid);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(mapToResponse(bid));
     }
 
     // ================= Reject a bid =================
     @PostMapping("/{bidId}/reject")
     public ResponseEntity<BidResponse> rejectBid(@PathVariable Long bidId) {
         Bid bid = bidService.rejectBid(bidId);
-        BidResponse response = mapToResponse(bid);
-        return ResponseEntity.ok(response);
-    }
-
-    // ================= Create dummy bid for testing =================
-    @PostMapping("/dummy/{produceId}")
-    public ResponseEntity<BidResponse> createDummyBid(@PathVariable Long produceId) {
-        Bid bid = bidService.createDummyBid(produceId);
-        BidResponse response = mapToResponse(bid);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(mapToResponse(bid));
     }
 
     // ================= Helper to convert Bid -> BidResponse =================
@@ -63,3 +52,4 @@ public class BidController {
                 .build();
     }
 }
+

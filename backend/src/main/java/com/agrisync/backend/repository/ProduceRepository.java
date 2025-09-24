@@ -20,4 +20,7 @@ public interface ProduceRepository extends JpaRepository<Produce, Long> {
       // Count active produces (for dashboard)
     @Query("SELECT COUNT(p) FROM Produce p WHERE p.farmer.id = :farmerId AND p.status = 'AVAILABLE'")
     Integer countActiveProduces(@Param("farmerId") Long farmerId);
+
+    // find produces by status
+    List<Produce> findByStatus(String status);
 }
