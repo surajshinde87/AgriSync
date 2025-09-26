@@ -1,7 +1,7 @@
 package com.agrisync.backend.controller;
 
 import com.agrisync.backend.dto.bid.BidResponse;
-import com.agrisync.backend.model.Bid;
+import com.agrisync.backend.entity.Bid;
 import com.agrisync.backend.service.BidService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,8 +1,8 @@
 package com.agrisync.backend.service;
 
-import com.agrisync.backend.model.User;
+import com.agrisync.backend.entity.Otp;
+import com.agrisync.backend.entity.User;
 import com.agrisync.backend.enums.OtpType;
-import com.agrisync.backend.model.Otp;
 import com.agrisync.backend.repository.UserRepository;
 import com.agrisync.backend.repository.OtpRepository;
 import lombok.RequiredArgsConstructor;

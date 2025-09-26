@@ -1,6 +1,6 @@
 package com.agrisync.backend.service;
 
-import com.agrisync.backend.model.Notification;
+import com.agrisync.backend.entity.Notification;
 import com.agrisync.backend.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

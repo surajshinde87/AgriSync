@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.agrisync.backend.model.FarmerProfile;
-import com.agrisync.backend.model.User;
+import com.agrisync.backend.entity.FarmerProfile;
+import com.agrisync.backend.entity.User;
 
 @Repository
 public interface FarmerProfileRepository extends JpaRepository<FarmerProfile, Long> {

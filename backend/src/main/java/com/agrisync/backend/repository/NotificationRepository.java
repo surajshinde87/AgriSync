@@ -2,7 +2,7 @@ package com.agrisync.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.agrisync.backend.model.Notification;
+import com.agrisync.backend.entity.Notification;
 
 import java.util.List;
 

@@ -1,9 +1,11 @@
 package com.agrisync.backend.repository;
 
 import org.springframework.stereotype.Repository;
+
+import com.agrisync.backend.entity.Bid;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.agrisync.backend.model.Bid;
 import java.util.List;
 
 @Repository

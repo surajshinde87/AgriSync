@@ -1,8 +1,10 @@
 package com.agrisync.backend.repository;
-import com.agrisync.backend.model.BuyerProfile;
-import com.agrisync.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.agrisync.backend.entity.BuyerProfile;
+import com.agrisync.backend.entity.User;
+
 import java.util.Optional;
 
 @Repository

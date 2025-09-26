@@ -2,8 +2,8 @@ package com.agrisync.backend.service;
 
 import com.agrisync.backend.dto.buyer.BuyerProfileRequest;
 import com.agrisync.backend.dto.buyer.BuyerProfileResponse;
-import com.agrisync.backend.model.BuyerProfile;
-import com.agrisync.backend.model.User;
+import com.agrisync.backend.entity.BuyerProfile;
+import com.agrisync.backend.entity.User;
 import com.agrisync.backend.repository.BuyerProfileRepository;
 import com.agrisync.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

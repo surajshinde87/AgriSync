@@ -1,4 +1,4 @@
-package com.agrisync.backend.model;
+package com.agrisync.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +19,8 @@ public class Produce {
 
  @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "farmer_id", nullable = false)
-private User farmer;
+private FarmerProfile farmer;
+
 
 
     @Column(nullable = false)

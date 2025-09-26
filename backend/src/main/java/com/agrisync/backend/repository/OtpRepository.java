@@ -1,7 +1,7 @@
 package com.agrisync.backend.repository;
 
+import com.agrisync.backend.entity.Otp;
 import com.agrisync.backend.enums.OtpType;
-import com.agrisync.backend.model.Otp;
 
 import jakarta.transaction.Transactional;
 

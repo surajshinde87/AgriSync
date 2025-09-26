@@ -1,7 +1,9 @@
 package com.agrisync.backend.repository;
 
-import com.agrisync.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.agrisync.backend.entity.User;
+
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {

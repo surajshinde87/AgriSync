@@ -1,10 +1,11 @@
 package com.agrisync.backend.repository;
 
-import com.agrisync.backend.model.Produce;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.agrisync.backend.entity.Produce;
 
 import java.util.List;
 
@@ -23,4 +24,24 @@ public interface ProduceRepository extends JpaRepository<Produce, Long> {
 
     // find produces by status
     List<Produce> findByStatus(String status);
+
+     List<Produce> findByActiveTrue();
+
+    // Search by crop type (case-insensitive, partial match)
+    List<Produce> findByActiveTrueAndCropTypeContainingIgnoreCase(String cropType);
+
+    // Filter by price range
+    @Query("SELECT p FROM Produce p WHERE p.active = true AND p.pricePerKg BETWEEN :minPrice AND :maxPrice")
+    List<Produce> findByPriceRange(@Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice);
+
+    // Filter by state or city
+    List<Produce> findByActiveTrueAndStateIgnoreCase(String state);
+    List<Produce> findByActiveTrueAndCityIgnoreCase(String city);
+
+    // Sort by price or quantity (ASC / DESC)
+    List<Produce> findByActiveTrueOrderByPricePerKgAsc();
+    List<Produce> findByActiveTrueOrderByPricePerKgDesc();
+    List<Produce> findByActiveTrueOrderByQuantityKgAsc();
+    List<Produce> findByActiveTrueOrderByQuantityKgDesc();
+    
 }

@@ -7,16 +7,16 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.agrisync.backend.dto.order.OrderDTO;
+import com.agrisync.backend.entity.Order;
 import com.agrisync.backend.enums.OrderStatus;
 import com.agrisync.backend.enums.PaymentStatus;
-import com.agrisync.backend.model.Order;
 import com.agrisync.backend.repository.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class FarmerOrderService {
      private final OrderRepository orderRepository;
 
     private OrderDTO mapToDTO(Order order) {

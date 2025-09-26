@@ -2,9 +2,9 @@ package com.agrisync.backend.service;
 
 import com.agrisync.backend.dto.bid.BidRequest;
 import com.agrisync.backend.dto.bid.BidResponse;
+import com.agrisync.backend.entity.Bid;
+import com.agrisync.backend.entity.Produce;
 import com.agrisync.backend.enums.BidStatus;
-import com.agrisync.backend.model.Bid;
-import com.agrisync.backend.model.Produce;
 import com.agrisync.backend.repository.BidRepository;
 import com.agrisync.backend.repository.ProduceRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.agrisync.backend.service;
 
 import com.agrisync.backend.dto.farmer.SalesAnalyticsResponse;
-import com.agrisync.backend.model.Order;
+import com.agrisync.backend.entity.Order;
 import com.agrisync.backend.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

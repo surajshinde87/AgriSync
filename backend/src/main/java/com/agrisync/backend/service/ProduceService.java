@@ -2,10 +2,10 @@ package com.agrisync.backend.service;
 
 import com.agrisync.backend.dto.produce.ProduceRequest;
 import com.agrisync.backend.dto.produce.ProduceResponse;
-import com.agrisync.backend.model.Produce;
-import com.agrisync.backend.model.User;
+import com.agrisync.backend.entity.FarmerProfile;
+import com.agrisync.backend.entity.Produce;
+import com.agrisync.backend.repository.FarmerProfileRepository;
 import com.agrisync.backend.repository.ProduceRepository;
-import com.agrisync.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,46 +18,47 @@ import java.util.stream.Collectors;
 public class ProduceService {
 
     private final ProduceRepository produceRepository;
-    private final UserRepository userRepository;       // Added
+    private final FarmerProfileRepository farmerProfileRepository;   
     private final GithubImageService githubImageService;
 
-    public ProduceResponse createProduce(Long farmerId, ProduceRequest request) {
-        String photoUrl = request.getPhotoUrl();
+   public ProduceResponse createProduce(Long farmerId, ProduceRequest request) {
+    String photoUrl = request.getPhotoUrl();
 
-        // upload to GitHub if photoFile is present
-        if (request.getPhotoFile() != null && !request.getPhotoFile().isEmpty()) {
-            photoUrl = githubImageService.uploadImage(
-                    request.getPhotoFile(),
-                    "produce_" + farmerId + "_" + System.currentTimeMillis() + ".jpg"
-            );
-        }
-
-        // fetch User entity
-        User farmer = userRepository.findById(farmerId)
-                .orElseThrow(() -> new RuntimeException("Farmer not found"));
-
-        Produce produce = Produce.builder()
-                .farmer(farmer) // link User entity
-                .cropType(request.getCropType())
-                .quantityKg(request.getQuantityKg())
-                .pricePerKg(request.getPricePerKg())
-                .harvestDate(request.getHarvestDate())
-                .city(request.getCity())
-                .state(request.getState())
-                .photoUrl(photoUrl)
-                .status("AVAILABLE")
-                .active(true)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        produce = produceRepository.save(produce);
-
-        return mapToResponse(produce);
+    // upload to GitHub if photoFile is present
+    if (request.getPhotoFile() != null && !request.getPhotoFile().isEmpty()) {
+        photoUrl = githubImageService.uploadImage(
+                request.getPhotoFile(),
+                "produce_" + farmerId + "_" + System.currentTimeMillis() + ".jpg"
+        );
     }
 
+    // fetch FarmerProfile entity (not User)
+    FarmerProfile farmer = farmerProfileRepository.findById(farmerId)
+            .orElseThrow(() -> new RuntimeException("Farmer not found"));
+
+    Produce produce = Produce.builder()
+            .farmer(farmer)
+            .cropType(request.getCropType())
+            .quantityKg(request.getQuantityKg())
+            .pricePerKg(request.getPricePerKg())
+            .harvestDate(request.getHarvestDate())
+            .city(request.getCity())
+            .state(request.getState())
+            .photoUrl(photoUrl)
+            .status("AVAILABLE")
+            .active(true)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
+
+    produce = produceRepository.save(produce);
+
+    return mapToResponse(produce);
+}
+
+
     public List<ProduceResponse> getFarmerProduces(Long farmerId) {
-        return produceRepository.findByFarmer_IdAndActiveTrue(farmerId) // updated
+        return produceRepository.findByFarmer_IdAndActiveTrue(farmerId)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

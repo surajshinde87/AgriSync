@@ -1,4 +1,4 @@
-package com.agrisync.backend.model;
+package com.agrisync.backend.entity;
 
 
 import jakarta.persistence.*;

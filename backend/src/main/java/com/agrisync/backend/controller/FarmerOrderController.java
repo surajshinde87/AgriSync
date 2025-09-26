@@ -1,7 +1,7 @@
 package com.agrisync.backend.controller;
 
 import com.agrisync.backend.dto.order.OrderDTO;
-import com.agrisync.backend.service.OrderService;
+import com.agrisync.backend.service.FarmerOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FarmerOrderController {
 
-    private final OrderService orderService;
+    private final FarmerOrderService orderService;
 
     // List all orders for logged-in farmer
     @GetMapping

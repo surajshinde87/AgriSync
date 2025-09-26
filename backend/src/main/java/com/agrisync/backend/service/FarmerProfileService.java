@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.agrisync.backend.dto.farmer.FarmerProfileRequest;
 import com.agrisync.backend.dto.farmer.FarmerProfileResponse;
-import com.agrisync.backend.model.FarmerProfile;
-import com.agrisync.backend.model.User;
+import com.agrisync.backend.entity.FarmerProfile;
+import com.agrisync.backend.entity.User;
 import com.agrisync.backend.repository.FarmerProfileRepository;
 import com.agrisync.backend.repository.UserRepository;
 

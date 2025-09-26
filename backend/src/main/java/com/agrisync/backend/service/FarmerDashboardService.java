@@ -8,14 +8,12 @@ import com.agrisync.backend.dto.farmer.TopCropResponse;
 import com.agrisync.backend.dto.order.OrderResponse;
 import com.agrisync.backend.dto.produce.ProduceResponse;
 import com.agrisync.backend.dto.transaction.PaymentResponse;
+import com.agrisync.backend.entity.Bid;
+import com.agrisync.backend.entity.FarmerProfile;
+import com.agrisync.backend.entity.Feedback;
+import com.agrisync.backend.entity.Order;
+import com.agrisync.backend.entity.Produce;
 import com.agrisync.backend.dto.feedback.FeedbackResponse;
-
-import com.agrisync.backend.model.Bid;
-import com.agrisync.backend.model.Order;
-import com.agrisync.backend.model.Produce;
-import com.agrisync.backend.model.FarmerProfile;
-import com.agrisync.backend.model.Feedback;
-
 import com.agrisync.backend.repository.BidRepository;
 import com.agrisync.backend.repository.FarmerProfileRepository;
 import com.agrisync.backend.repository.ProduceRepository;

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.agrisync.backend.model.Notification;
+import com.agrisync.backend.entity.Notification;
 import com.agrisync.backend.service.NotificationService;
 
 import java.util.List;
