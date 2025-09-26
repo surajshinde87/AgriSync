@@ -1,6 +1,7 @@
 package com.agrisync.backend.service;
 
 import com.agrisync.backend.dto.order.OrderResponse;
+import com.agrisync.backend.dto.transaction.PaymentResponse;
 import com.agrisync.backend.entity.FarmerProfile;
 import com.agrisync.backend.entity.Order;
 import com.agrisync.backend.entity.Produce;
@@ -74,6 +75,54 @@ public class BuyerOrderService {
                 .map(this::mapToResponse)
                 .toList();
     }
+
+    // Total spent by buyer all time
+public Double getTotalSpentAllTime(Long buyerId) {
+    return orderRepository.findByBuyerId(buyerId)
+            .stream()
+            .mapToDouble(Order::getTotalAmount)
+            .sum();
+}
+
+// Total spent in last 30 days
+public Double getSpentLast30Days(Long buyerId) {
+    LocalDateTime from = LocalDateTime.now().minusDays(30);
+    return orderRepository.findByBuyerId(buyerId)
+            .stream()
+            .filter(o -> o.getCreatedAt().isAfter(from))
+            .mapToDouble(Order::getTotalAmount)
+            .sum();
+}
+
+// Count of orders
+public Integer getBuyerOrdersCount(Long buyerId) {
+    return orderRepository.countByBuyerId(buyerId);
+}
+
+// Count of pending payments
+public Integer getPendingPaymentsCount(Long buyerId) {
+    return (int) orderRepository.findByBuyerId(buyerId)
+            .stream()
+            .filter(o -> o.getPaymentStatus() == PaymentStatus.PENDING)
+            .count();
+}
+
+// Recent transactions
+public List<PaymentResponse> getRecentTransactions(Long buyerId) {
+    return orderRepository.findByBuyerId(buyerId)
+            .stream()
+            .map(o -> PaymentResponse.builder()
+                    .paymentId(o.getId())
+                    .orderId(o.getId())
+                    .amount(o.getTotalAmount())
+                    .status(o.getPaymentStatus().name())
+                    .timestamp(o.getUpdatedAt())
+                    .build())
+            .sorted((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()))
+            .limit(5)
+            .toList();
+}
+
 
     private OrderResponse mapToResponse(Order order) {
         return OrderResponse.builder()

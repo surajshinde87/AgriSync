@@ -61,6 +61,21 @@ public class FeedbackService {
                 .toList();
     }
 
+    public List<FeedbackResponse> getRecentFeedbacksByBuyer(Long buyerId) {
+    return feedbackRepository.findTop5ByBuyerIdOrderByCreatedAtDesc(buyerId)
+            .stream()
+            .map(f -> FeedbackResponse.builder()
+                    .ratingId(f.getId())
+                    .buyerId(f.getBuyerId())
+                    .buyerName(f.getBuyerName())
+                    .rating(f.getRating())
+                    .comment(f.getComment())
+                    .createdAt(f.getCreatedAt())
+                    .build())
+            .toList();
+}
+
+
     private FeedbackResponse mapToResponse(Feedback feedback) {
         return FeedbackResponse.builder()
                 .ratingId(feedback.getId())

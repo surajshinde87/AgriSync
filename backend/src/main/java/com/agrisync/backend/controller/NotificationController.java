@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.agrisync.backend.dto.notification.NotificationResponse;
 import com.agrisync.backend.entity.Notification;
 import com.agrisync.backend.service.NotificationService;
 
@@ -16,11 +17,13 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    // Fetch unread notifications
-    @GetMapping("/unread/{buyerId}")
-    public ResponseEntity<List<Notification>> getUnread(@PathVariable Long buyerId) {
-        return ResponseEntity.ok(notificationService.getUnreadNotifications(buyerId));
-    }
+   // Fetch unread notifications
+@GetMapping("/unread/{buyerId}")
+public ResponseEntity<List<NotificationResponse>> getUnread(@PathVariable Long buyerId) {
+    List<NotificationResponse> unreadNotifications = notificationService.getUnreadNotifications(buyerId);
+    return ResponseEntity.ok(unreadNotifications);
+}
+
 
     // Fetch all notifications
     @GetMapping("/{buyerId}")

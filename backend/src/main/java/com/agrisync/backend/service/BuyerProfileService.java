@@ -68,4 +68,5 @@ public class BuyerProfileService {
                 .profileImageUrl(profile.getProfileImageUrl())
                 .build();
     }
+    
 }

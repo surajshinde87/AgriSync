@@ -107,6 +107,14 @@ public class ProduceService {
         produceRepository.save(produce);
     }
 
+    public List<ProduceResponse> getAllAvailableProduces(int limit) {
+    return produceRepository.findByStatus("AVAILABLE")
+            .stream()
+            .limit(limit)
+            .map(this::mapToResponse)
+            .toList();
+}
+
     private ProduceResponse mapToResponse(Produce produce) {
         return ProduceResponse.builder()
                 .id(produce.getId())

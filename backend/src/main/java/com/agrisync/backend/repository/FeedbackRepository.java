@@ -13,4 +13,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     @Query("SELECT f FROM Feedback f WHERE f.farmer.id = :farmerId ORDER BY f.createdAt DESC")
     List<Feedback> findByFarmerId(@Param("farmerId") Long farmerId);
+
+    List<Feedback> findTop5ByBuyerIdOrderByCreatedAtDesc(Long buyerId);
+
 }

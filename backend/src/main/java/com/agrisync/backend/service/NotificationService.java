@@ -1,5 +1,6 @@
 package com.agrisync.backend.service;
 
+import com.agrisync.backend.dto.notification.NotificationResponse;
 import com.agrisync.backend.entity.Notification;
 import com.agrisync.backend.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,20 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/notifications/" + buyerId, notification);
     }
 
-    public List<Notification> getUnreadNotifications(Long buyerId) {
-        return notificationRepository.findByUserIdAndReadFlagFalse(buyerId);
-    }
+public List<NotificationResponse> getUnreadNotifications(Long buyerId) {
+    List<Notification> notifications = notificationRepository.findByUserIdAndReadFlagFalse(buyerId);
+
+    return notifications.stream().map(notification -> {
+        NotificationResponse response = new NotificationResponse();
+        response.setNotificationId(notification.getId());
+        response.setUserId(notification.getUserId());
+        response.setMessage(notification.getMessage());
+        response.setStatus(notification.getStatus());
+        response.setCreatedAt(notification.getCreatedAt().toString());
+        return response;
+    }).toList();
+}
+
 
     public List<Notification> getAllNotifications(Long buyerId) {
         return notificationRepository.findByUserId(buyerId);
@@ -47,5 +59,7 @@ public class NotificationService {
         notification.setReadFlag(true);
         notificationRepository.save(notification);
     }
+
+    
 }
 

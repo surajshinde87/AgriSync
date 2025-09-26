@@ -113,6 +113,20 @@ public class BidService {
         return bid;
     }
 
+    // Active bids
+public List<BidResponse> getActiveBidsForBuyer(Long buyerId) {
+    return bidRepository.findByBuyerIdAndStatus(buyerId, BidStatus.OPEN)
+            .stream()
+            .map(this::mapToResponse)
+            .toList();
+}
+
+// Count of active bids
+public Integer getActiveBidsCountForBuyer(Long buyerId) {
+    return bidRepository.countByBuyerIdAndStatus(buyerId, BidStatus.OPEN);
+}
+
+
     // ================== HELPER ==================
 
     /**
