@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #16A34A;   /* Green */
+  --color-secondary: #FACC15; /* Yellow */
+  --color-accent: #FB923C;    /* Orange */
+  --color-dark: #1E293B;      /* Slate */
+  --color-light: #F8FAFC;     /* White-ish */
+
+  
+  --font-sans: "Inter", sans-serif;
+  --font-heading: "Poppins", sans-serif;
+}
