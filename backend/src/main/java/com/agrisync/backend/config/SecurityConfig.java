@@ -11,15 +11,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // disable CSRF for testing
+            .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+            .cors(cors -> {})             // enable CORS
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/register", "/api/users/login",
-                "/api/users/verify-otp",
-                "/api/users/forgot-password",
-                "/api/users/reset-password").permitAll() // public endpoints
-                .anyRequest().permitAll() // all others require authentication
+                .requestMatchers(
+                        "/api/users/register",
+                        "/api/users/login",
+                        "/api/users/verify-otp",
+                        "/api/users/forgot-password",
+                        "/api/users/reset-password",
+                        "/ws/**" // allow websocket endpoint
+                ).permitAll()
+                .anyRequest().authenticated() // all others require token
             )
-            .httpBasic(customizer -> {}); // basic auth for testing
+            .httpBasic(customizer -> {}); // basic auth for quick testing (optional)
         return http.build();
     }
 }

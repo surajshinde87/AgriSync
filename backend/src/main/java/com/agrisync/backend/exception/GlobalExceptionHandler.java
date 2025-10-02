@@ -1,5 +1,6 @@
 package com.agrisync.backend.exception;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -11,23 +12,25 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Handles general runtime exceptions
+    // Handle general runtime exceptions
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        Map<String, String> response = new HashMap<>();
+        
         if (ex.getMessage() != null && ex.getMessage().contains("Email already registered")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Email is already registered. Please use another email.");
+            response.put("message", "Email is already registered. Please use another email.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Something went wrong: " + ex.getMessage());
+
+        response.put("message", "Something went wrong: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    // Handles file upload size exceeded exception
+    // Handle file upload size exceeded exception
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Map<String, String>> handleMaxSize(MaxUploadSizeExceededException ex) {
-        return ResponseEntity
-                .status(HttpStatus.PAYLOAD_TOO_LARGE) // 413
-                .body(Map.of("error", "File too large. Maximum allowed size is 5MB"));
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "File too large. Maximum allowed size is 5MB");
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(response);
     }
-
 }

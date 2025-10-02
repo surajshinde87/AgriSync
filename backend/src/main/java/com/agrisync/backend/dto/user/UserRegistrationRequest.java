@@ -20,7 +20,6 @@ public class UserRegistrationRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
 
     @NotBlank(message = "Role is required")

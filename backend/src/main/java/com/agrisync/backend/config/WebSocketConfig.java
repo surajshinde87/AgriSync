@@ -12,16 +12,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Prefix for subscribing to notifications
+        // Client subscribes here: /topic/...
         config.enableSimpleBroker("/topic");
-        // Prefix for sending messages
+        // Client sends messages to /app/...
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
-                .withSockJS(); // fallback
+                .setAllowedOriginPatterns("http://localhost:5173") // allow only frontend
+                .withSockJS(); // fallback for older browsers
     }
 }
