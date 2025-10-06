@@ -1,5 +1,6 @@
 package com.agrisync.backend.controller;
 
+import com.agrisync.backend.config.JwtUtil;
 import com.agrisync.backend.dto.user.ForgotPasswordRequest;
 import com.agrisync.backend.dto.user.LoginRequest;
 import com.agrisync.backend.dto.user.OtpVerificationRequest;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -22,6 +24,9 @@ import jakarta.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // ================= Register User =================
     @PostMapping("/register")
@@ -58,17 +63,21 @@ public class UserController {
     }
 
     // ================= Login =================
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
         User user = userService.login(request.getEmail(), request.getPassword());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "Login successful!");
+        response.put("token", token);
         response.put("user", Map.of(
                 "id", user.getId(),
+                "firstName", user.getFirstName(),
+                "lastName", user.getLastName(),
                 "role", user.getRole()));
-
         return ResponseEntity.ok(response);
     }
 

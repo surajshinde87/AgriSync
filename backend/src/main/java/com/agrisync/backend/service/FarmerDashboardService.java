@@ -8,17 +8,9 @@ import com.agrisync.backend.dto.farmer.TopCropResponse;
 import com.agrisync.backend.dto.order.OrderResponse;
 import com.agrisync.backend.dto.produce.ProduceResponse;
 import com.agrisync.backend.dto.transaction.PaymentResponse;
-import com.agrisync.backend.entity.Bid;
-import com.agrisync.backend.entity.FarmerProfile;
-import com.agrisync.backend.entity.Feedback;
-import com.agrisync.backend.entity.Order;
-import com.agrisync.backend.entity.Produce;
 import com.agrisync.backend.dto.feedback.FeedbackResponse;
-import com.agrisync.backend.repository.BidRepository;
-import com.agrisync.backend.repository.FarmerProfileRepository;
-import com.agrisync.backend.repository.ProduceRepository;
-import com.agrisync.backend.repository.OrderRepository;
-import com.agrisync.backend.repository.FeedbackRepository;
+import com.agrisync.backend.entity.*;
+import com.agrisync.backend.repository.*;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,11 +29,15 @@ public class FarmerDashboardService {
     private final OrderRepository orderRepository;
     private final BidRepository bidRepository;
     private final FeedbackRepository feedbackRepository;
+    private final UserRepository userRepository; // ✅ Add this line
 
-    public FarmerDashboardResponse getDashboard(Long farmerId) {
+    public FarmerDashboardResponse getDashboard(Long userId) {
 
-        // 1) Farmer profile
-        FarmerProfile farmerProfile = farmerProfileRepository.findById(farmerId)
+        // ✅ FIXED: Find farmer profile using userId
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        FarmerProfile farmerProfile = farmerProfileRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Farmer not found"));
 
         FarmerProfileResponse profileDto = FarmerProfileResponse.builder()
@@ -61,13 +57,15 @@ public class FarmerDashboardService {
                 .farmLocation(farmerProfile.getFarmLocation())
                 .build();
 
-        // 2) Orders and produces
-        List<Order> orders = Optional.ofNullable(orderRepository.findByFarmer_Id(farmerId))
+        Long farmerProfileId = farmerProfile.getId(); // ✅ use profileId for internal queries
+
+        // Orders and produces
+        List<Order> orders = Optional.ofNullable(orderRepository.findByFarmer_Id(farmerProfileId))
                 .orElse(Collections.emptyList());
-        List<Produce> produces = Optional.ofNullable(produceRepository.findByFarmer_IdAndActiveTrue(farmerId))
+        List<Produce> produces = Optional.ofNullable(produceRepository.findByFarmer_IdAndActiveTrue(farmerProfileId))
                 .orElse(Collections.emptyList());
 
-        // 3) Summary
+        // Summary calculations
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         LocalDateTime days30 = now.minusDays(30);
 
@@ -104,7 +102,7 @@ public class FarmerDashboardService {
                 .pendingPayments(pendingPayments)
                 .build();
 
-        // 4) Top crops
+        // Top crops
         Map<String, Double> revenueByCrop = orders.stream()
                 .filter(o -> o.getProduce() != null && o.getTotalAmount() != null)
                 .collect(Collectors.groupingBy(
@@ -129,7 +127,7 @@ public class FarmerDashboardService {
                 .limit(5)
                 .collect(Collectors.toList());
 
-        // 5) Produce list
+        // Produce list
         List<ProduceResponse> produceList = produces.stream()
                 .map(p -> ProduceResponse.builder()
                         .id(p.getId())
@@ -145,81 +143,36 @@ public class FarmerDashboardService {
                         .build())
                 .collect(Collectors.toList());
 
-        // 6) Active bids - FIXED: Added explicit type casting and proper method reference
-        List<Bid> activeBidsEntities = Optional.ofNullable(bidRepository.findByProduce_Farmer_IdAndActiveTrue(farmerId))
+        // Active bids
+        List<Bid> activeBidsEntities = Optional.ofNullable(bidRepository.findByProduce_Farmer_IdAndActiveTrue(farmerProfileId))
                 .orElse(Collections.emptyList());
-        
+
         List<BidResponse> activeBids = activeBidsEntities.stream()
-                .map((Bid b) -> { // Explicit type declaration
-                    return BidResponse.builder()
-                            .bidId(b.getId())
-                            .produceId(b.getProduce() != null ? b.getProduce().getId() : null)
-                            .buyerId(b.getBuyerId())
-                            .buyerName(b.getBuyerName() != null ? b.getBuyerName() : ("Buyer-" + (b.getBuyerId() != null ? b.getBuyerId() : "")))
-                            .bidPricePerKg(b.getBidPricePerKg())
-                            .quantityKg(b.getQuantityKg())
-                            .status(b.getStatus() != null ? b.getStatus().name() : "UNKNOWN")
-                            .placedAt(b.getPlacedAt())
-                            .build();
-                })
+                .map(b -> BidResponse.builder()
+                        .bidId(b.getId())
+                        .produceId(b.getProduce() != null ? b.getProduce().getId() : null)
+                        .buyerId(b.getBuyerId())
+                        .buyerName(b.getBuyerName() != null ? b.getBuyerName() : "Buyer-" + b.getBuyerId())
+                        .bidPricePerKg(b.getBidPricePerKg())
+                        .quantityKg(b.getQuantityKg())
+                        .status(b.getStatus() != null ? b.getStatus().name() : "UNKNOWN")
+                        .placedAt(b.getPlacedAt())
+                        .build())
                 .collect(Collectors.toList());
 
-        // 7) Orders
-       List<OrderResponse> ordersDto = orders.stream()
-        .map(o -> OrderResponse.builder()
-                .orderId(o.getId())
-                .produceId(o.getProduce() != null ? o.getProduce().getId() : null)
-                // Use dummy buyer name for now
-                .buyerName("Buyer-" + (o.getBuyerId() != null ? o.getBuyerId() : "N/A"))
-                .quantityKg(o.getQuantityKg())
-                .finalPricePerKg(o.getPricePerKg())
-                .totalAmount(o.getTotalAmount())
-                .status(o.getStatus() != null ? o.getStatus().name() : "UNKNOWN")
-                .paymentStatus(o.getPaymentStatus() != null ? o.getPaymentStatus().name() : "UNKNOWN")
-                .deliveryExpectedAt(o.getDeliveryExpectedAt())
-                .build())
-        .collect(Collectors.toList());
-        
-        // 8) Recent transactions - FIXED: Explicit type handling for comparator
-        List<PaymentResponse> recentTransactions = orders.stream()
-                .filter(o -> o.getPaymentStatus() != null && "RELEASED".equalsIgnoreCase(o.getPaymentStatus().name()))
-                .sorted(Comparator.comparing(
-                        (Order o) -> o.getUpdatedAt() != null ? o.getUpdatedAt() : o.getCreatedAt(),
-                        Comparator.nullsLast(Comparator.naturalOrder())
-                ).reversed())
-                .limit(10)
-                .map((Order o) -> { // Explicit type declaration
-                    return PaymentResponse.builder()
-                            .paymentId(null)
-                            .orderId(o.getId())
-                            .amount(o.getTotalAmount())
-                            .status(o.getPaymentStatus().name())
-                            .timestamp(o.getUpdatedAt() != null ? o.getUpdatedAt() : o.getCreatedAt())
-                            .build();
-                })
-                .collect(Collectors.toList());
-
-        // 9) Recent feedbacks - FIXED: Explicit type handling
-        List<Feedback> feedbacks = Optional.ofNullable(feedbackRepository.findByFarmerId(farmerId))
-                .orElse(Collections.emptyList());
-        
-        List<FeedbackResponse> recentFeedbacks = feedbacks.stream()
-                .filter(f -> f.getCreatedAt() != null)
-                .sorted(Comparator.comparing(
-                        (Feedback f) -> f.getCreatedAt(),
-                        Comparator.nullsLast(Comparator.naturalOrder())
-                ).reversed())
-                .limit(5)
-                .map((Feedback f) -> { // Explicit type declaration
-                    return FeedbackResponse.builder()
-                            .ratingId(f.getId())
-                            .buyerId(f.getBuyerId())
-                            .buyerName(f.getBuyerName() != null ? f.getBuyerName() : "")
-                            .rating(f.getRating())
-                            .comment(f.getComment())
-                            .createdAt(f.getCreatedAt())
-                            .build();
-                })
+        // Orders DTO
+        List<OrderResponse> ordersDto = orders.stream()
+                .map(o -> OrderResponse.builder()
+                        .orderId(o.getId())
+                        .produceId(o.getProduce() != null ? o.getProduce().getId() : null)
+                        .buyerName("Buyer-" + (o.getBuyerId() != null ? o.getBuyerId() : "N/A"))
+                        .quantityKg(o.getQuantityKg())
+                        .finalPricePerKg(o.getPricePerKg())
+                        .totalAmount(o.getTotalAmount())
+                        .status(o.getStatus() != null ? o.getStatus().name() : "UNKNOWN")
+                        .paymentStatus(o.getPaymentStatus() != null ? o.getPaymentStatus().name() : "UNKNOWN")
+                        .deliveryExpectedAt(o.getDeliveryExpectedAt())
+                        .build())
                 .collect(Collectors.toList());
 
         // Final payload
@@ -230,8 +183,6 @@ public class FarmerDashboardService {
                 .produceList(produceList)
                 .activeBids(activeBids)
                 .orders(ordersDto)
-                .recentTransactions(recentTransactions)
-                .recentFeedbacks(recentFeedbacks)
                 .build();
     }
 }

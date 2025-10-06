@@ -11,18 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class FarmerDashboardController {
 
-    private final FarmerDashboardService dashboardService;
+    private final FarmerDashboardService farmerDashboardService;
 
-    /**
-     * GET /api/farmer/dashboard
-     * Returns dashboard payload including profile, summary, top crops, produces, active bids, orders, transactions, feedbacks
-     *
-     * @param farmerId ID of the farmer (could be obtained from JWT in production)
-     * @return FarmerDashboardResponse
-     */
-    @GetMapping("/dashboard")
-    public ResponseEntity<FarmerDashboardResponse> getDashboard(@RequestParam Long farmerId) {
-        FarmerDashboardResponse dashboard = dashboardService.getDashboard(farmerId);
-        return ResponseEntity.ok(dashboard);
+    @GetMapping("/dashboard/{userId}")
+    public ResponseEntity<FarmerDashboardResponse> getDashboard(@PathVariable Long userId) {
+        FarmerDashboardResponse response = farmerDashboardService.getDashboard(userId);
+        return ResponseEntity.ok(response);
     }
 }

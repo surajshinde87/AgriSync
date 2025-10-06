@@ -56,6 +56,10 @@ public FarmerProfileResponse updateProfile(Long userId, FarmerProfileRequest req
     return mapToResponse(user, saved);
 }
 
+public FarmerProfile getProfileByUserId(Long userId) {
+    return farmerProfileRepository.findByUserId(userId).orElse(null);
+}
+
 
 
     public FarmerProfileResponse getProfile(Long userId) {

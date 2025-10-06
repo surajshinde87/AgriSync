@@ -2,8 +2,11 @@ package com.agrisync.backend.controller;
 
 import com.agrisync.backend.dto.farmer.FarmerProfileRequest;
 import com.agrisync.backend.dto.farmer.FarmerProfileResponse;
+import com.agrisync.backend.entity.FarmerProfile;
 import com.agrisync.backend.service.FarmerProfileService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,9 +58,16 @@ public ResponseEntity<FarmerProfileResponse> updateProfile(
 
 
     // ================= Get Profile =================
-    @GetMapping("/{userId}")
-    public ResponseEntity<FarmerProfileResponse> getProfile(@PathVariable Long userId) {
-        return ResponseEntity.ok(farmerProfileService.getProfile(userId));
+  @GetMapping("/{userId}")
+public ResponseEntity<FarmerProfile> getFarmerProfile(@PathVariable Long userId) {
+    FarmerProfile profile = farmerProfileService.getProfileByUserId(userId);
+
+    if (profile == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    return ResponseEntity.ok(profile);
+}
+
 }
 
