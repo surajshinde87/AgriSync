@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../utils/axios';
 
+// ====================== ASYNC THUNKS ====================== //
 export const addDriverRating = createAsyncThunk(
   'driver/addRating',
   async ({ driverId, ratingData }, { rejectWithValue }) => {
@@ -169,6 +170,7 @@ export const getDriverAverageRating = createAsyncThunk(
   }
 );
 
+// ====================== INITIAL STATE ====================== //
 const initialState = {
   orders: [],
   earnings: [],
@@ -181,6 +183,7 @@ const initialState = {
   error: null,
 };
 
+// ====================== SLICE ====================== //
 const driverSlice = createSlice({
   name: 'driver',
   initialState,
@@ -190,33 +193,15 @@ const driverSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // ✅ Specific addCase() handlers FIRST
     builder
-      .addMatcher(
-        (action) => action.type.endsWith('/pending'),
-        (state) => {
-          state.loading = true;
-          state.error = null;
-        }
-      )
-      .addMatcher(
-        (action) => action.type.endsWith('/fulfilled'),
-        (state) => {
-          state.loading = false;
-        }
-      )
-      .addMatcher(
-        (action) => action.type.endsWith('/rejected'),
-        (state, action) => {
-          state.loading = false;
-          state.error = action.payload?.message || 'Operation failed';
-        }
-      )
-      // Specific fulfilled cases
       .addCase(addDriverRating.fulfilled, (state, action) => {
         state.ratings.push(action.payload);
       })
       .addCase(updateDriverOrderStatus.fulfilled, (state, action) => {
-        state.orders = state.orders.map((o) => (o.id === action.meta.arg.driverOrderId ? action.payload : o));
+        state.orders = state.orders.map((o) =>
+          o.id === action.meta.arg.driverOrderId ? action.payload : o
+        );
       })
       .addCase(updateDriverProfile.fulfilled, (state, action) => {
         state.profile = action.payload;
@@ -243,7 +228,9 @@ const driverSlice = createSlice({
         state.orders.push(action.payload);
       })
       .addCase(markEarningPaid.fulfilled, (state, action) => {
-        state.earnings = state.earnings.map((e) => (e.id === action.meta.arg ? { ...e, paid: true } : e));
+        state.earnings = state.earnings.map((e) =>
+          e.id === action.meta.arg ? { ...e, paid: true } : e
+        );
       })
       .addCase(getDriverDashboard.fulfilled, (state, action) => {
         state.dashboard = action.payload;
@@ -254,6 +241,30 @@ const driverSlice = createSlice({
       .addCase(getDriverAverageRating.fulfilled, (state, action) => {
         state.averageRating = action.payload;
       });
+
+    // ✅ Now add the Matchers (AFTER addCase)
+    builder.addMatcher(
+      (action) => action.type.endsWith('/pending'),
+      (state) => {
+        state.loading = true;
+        state.error = null;
+      }
+    );
+
+    builder.addMatcher(
+      (action) => action.type.endsWith('/fulfilled'),
+      (state) => {
+        state.loading = false;
+      }
+    );
+
+    builder.addMatcher(
+      (action) => action.type.endsWith('/rejected'),
+      (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Operation failed';
+      }
+    );
   },
 });
 

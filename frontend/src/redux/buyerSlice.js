@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../utils/axios';
 
+// ===================== ASYNC THUNKS ===================== //
 export const searchBuyerProduce = createAsyncThunk(
   'buyer/searchProduce',
   async (query, { rejectWithValue }) => {
@@ -181,6 +182,7 @@ export const getBuyerNotifications = createAsyncThunk(
   }
 );
 
+// ===================== INITIAL STATE ===================== //
 const initialState = {
   orders: [],
   produce: [],
@@ -194,6 +196,7 @@ const initialState = {
   error: null,
 };
 
+// ===================== SLICE ===================== //
 const buyerSlice = createSlice({
   name: 'buyer',
   initialState,
@@ -203,7 +206,56 @@ const buyerSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Common pending, fulfilled, rejected using addMatcher
+    // ✅ All addCase() come first
+    builder
+      .addCase(getBuyerOrders.fulfilled, (state, action) => {
+        state.orders = action.payload;
+      })
+      .addCase(getBuyerDashboard.fulfilled, (state, action) => {
+        state.dashboard = action.payload;
+      })
+      .addCase(placeBuyerBid.fulfilled, (state, action) => {
+        state.bids.push(action.payload);
+      })
+      .addCase(getBuyerBids.fulfilled, (state, action) => {
+        state.bids = action.payload;
+      })
+      .addCase(placeBuyerOrder.fulfilled, (state, action) => {
+        state.orders.push(action.payload);
+      })
+      .addCase(cancelBid.fulfilled, (state, action) => {
+        state.bids = state.bids.map((b) =>
+          b.id === action.meta.arg ? { ...b, status: 'cancelled' } : b
+        );
+      })
+      .addCase(addBuyerFeedback.fulfilled, (state, action) => {
+        state.feedbacks.push(action.payload);
+      })
+      .addCase(getBuyerProduce.fulfilled, (state, action) => {
+        state.produce = action.payload;
+      })
+      .addCase(getBuyerProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
+      })
+      .addCase(getBuyerFeedbacksByFarmer.fulfilled, (state, action) => {
+        state.feedbacks = action.payload;
+      })
+      .addCase(markNotificationRead.fulfilled, (state, action) => {
+        state.notifications = state.notifications.map((n) =>
+          n.id === action.meta.arg ? { ...n, read: true } : n
+        );
+      })
+      .addCase(getUnreadNotifications.fulfilled, (state, action) => {
+        state.unreadNotifications = action.payload;
+      })
+      .addCase(getBuyerNotifications.fulfilled, (state, action) => {
+        state.notifications = action.payload;
+      })
+      .addCase(searchBuyerProduce.fulfilled, (state, action) => {
+        state.produce = action.payload;
+      });
+
+    // ✅ Matchers AFTER addCase()
     builder.addMatcher(
       (action) => action.type.endsWith('/pending'),
       (state) => {
@@ -226,50 +278,6 @@ const buyerSlice = createSlice({
         state.error = action.payload?.message || 'Operation failed';
       }
     );
-
-    // Specific fulfilled cases
-    builder.addCase(getBuyerOrders.fulfilled, (state, action) => {
-      state.orders = action.payload;
-    });
-    builder.addCase(getBuyerDashboard.fulfilled, (state, action) => {
-      state.dashboard = action.payload;
-    });
-    builder.addCase(placeBuyerBid.fulfilled, (state, action) => {
-      state.bids.push(action.payload);
-    });
-    builder.addCase(getBuyerBids.fulfilled, (state, action) => {
-      state.bids = action.payload;
-    });
-    builder.addCase(placeBuyerOrder.fulfilled, (state, action) => {
-      state.orders.push(action.payload);
-    });
-    builder.addCase(cancelBid.fulfilled, (state, action) => {
-      state.bids = state.bids.map((b) => (b.id === action.meta.arg ? { ...b, status: 'cancelled' } : b));
-    });
-    builder.addCase(addBuyerFeedback.fulfilled, (state, action) => {
-      state.feedbacks.push(action.payload);
-    });
-    builder.addCase(getBuyerProduce.fulfilled, (state, action) => {
-      state.produce = action.payload;
-    });
-    builder.addCase(getBuyerProfile.fulfilled, (state, action) => {
-      state.profile = action.payload;
-    });
-    builder.addCase(getBuyerFeedbacksByFarmer.fulfilled, (state, action) => {
-      state.feedbacks = action.payload;
-    });
-    builder.addCase(markNotificationRead.fulfilled, (state, action) => {
-      state.notifications = state.notifications.map((n) => (n.id === action.meta.arg ? { ...n, read: true } : n));
-    });
-    builder.addCase(getUnreadNotifications.fulfilled, (state, action) => {
-      state.unreadNotifications = action.payload;
-    });
-    builder.addCase(getBuyerNotifications.fulfilled, (state, action) => {
-      state.notifications = action.payload;
-    });
-    builder.addCase(searchBuyerProduce.fulfilled, (state, action) => {
-      state.produce = action.payload;
-    });
   },
 });
 

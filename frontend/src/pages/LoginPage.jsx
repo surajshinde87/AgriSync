@@ -61,10 +61,16 @@ export default function LoginPage() {
     try {
       const response = await axiosInstance.post("/users/login", loginData);
       if (response.data.success) {
-        const userRole = response.data.user?.role || "USER";
+        const { user, token } = response.data;
+
+        // Save user and token
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
         toast.success(response.data.message || "Login successful!");
 
-        switch (userRole) {
+        // Redirect based on role
+        switch (user.role) {
           case "FARMER":
             navigate("/farmer/dashboard");
             break;
