@@ -1,24 +1,26 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosInstance from '../utils/axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosInstance from "../utils/axios";
 
 // ===================== ASYNC THUNKS ===================== //
 export const searchBuyerProduce = createAsyncThunk(
-  'buyer/searchProduce',
+  "buyer/searchProduce",
   async (query, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post('/buyer/produce/search', query);
+      const response = await axiosInstance.post("/buyer/produce/search", query);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const getBuyerOrders = createAsyncThunk(
   'buyer/getOrders',
-  async (_, { rejectWithValue }) => {
+  async (buyerId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/buyer/orders');
+      const response = await axiosInstance.get('/buyer/orders', {
+        params: { buyerId },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -26,47 +28,57 @@ export const getBuyerOrders = createAsyncThunk(
   }
 );
 
+
 export const getBuyerDashboard = createAsyncThunk(
-  'buyer/getDashboard',
+  "buyer/getDashboard",
   async (buyerId, { rejectWithValue }) => {
     try {
+      if (!buyerId) throw new Error("Buyer ID is missing");
+
       const response = await axiosInstance.get(`/buyer/dashboard/${buyerId}`);
+
+      if (!response.data || typeof response.data !== "object") {
+        throw new Error("Invalid dashboard data received from API");
+      }
+
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const placeBuyerBid = createAsyncThunk(
-  'buyer/placeBid',
+  "buyer/placeBid",
   async (bidData, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post('/buyer/bids', bidData);
+      const response = await axiosInstance.post("/buyer/bids", bidData);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const updateBuyerProfile = createAsyncThunk(
-  'buyer/updateProfile',
+  "buyer/updateProfile",
   async ({ userId, data }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(`/buyer/profile/${userId}`, data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const getBuyerBids = createAsyncThunk(
   'buyer/getBids',
-  async (_, { rejectWithValue }) => {
+  async (buyerId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/buyer/bids');
+      const response = await axiosInstance.get(`/buyer/bids`, {
+        params: { buyerId },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -75,109 +87,134 @@ export const getBuyerBids = createAsyncThunk(
 );
 
 export const placeBuyerOrder = createAsyncThunk(
-  'buyer/placeOrder',
-  async (orderData, { rejectWithValue }) => {
+  "buyer/placeOrder",
+  async ({ buyerId, produceId, quantityKg }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post('/buyer/orders/place', orderData);
+      const response = await axiosInstance.post(
+        `/buyer/orders/place?buyerId=${buyerId}&produceId=${produceId}&quantityKg=${quantityKg}`
+      );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      console.error("Failed to place order:", error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
+
 export const cancelBid = createAsyncThunk(
-  'buyer/cancelBid',
+  "buyer/cancelBid",
   async (bidId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(`/buyer/bids/${bidId}/cancel`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const addBuyerFeedback = createAsyncThunk(
-  'buyer/addFeedback',
-  async (feedbackData, { rejectWithValue }) => {
+  "buyer/addFeedback",
+  async ({ buyerId, buyerName, orderId, rating, comment }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post('/buyer/feedbacks/add', feedbackData);
+
+      const response = await axiosInstance.post(
+        `/buyer/feedbacks/add?buyerId=${buyerId}&buyerName=${encodeURIComponent(buyerName)}`,
+        {
+          orderId,
+          rating,
+          comment,
+        }
+      );
+
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data?.message || "Failed to submit feedback");
     }
   }
 );
 
+
+
+
+
 export const getBuyerProduce = createAsyncThunk(
-  'buyer/getProduce',
+  "buyer/getProduce",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/buyer/produce');
+      const response = await axiosInstance.get("/buyer/produce");
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const getBuyerProfile = createAsyncThunk(
-  'buyer/getProfile',
+  "buyer/getProfile",
   async (userId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/buyer/profile/${userId}`);
-      return response.data;
+
+      const profileData = response.data?.data || response.data;
+
+      if (!profileData || typeof profileData !== "object") {
+        throw new Error("Invalid profile data");
+      }
+
+      return profileData;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
+
 export const getBuyerFeedbacksByFarmer = createAsyncThunk(
-  'buyer/getFeedbacksByFarmer',
+  "buyer/getFeedbacksByFarmer",
   async (farmerId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/buyer/feedbacks/farmer/${farmerId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const markNotificationRead = createAsyncThunk(
-  'buyer/markNotificationRead',
+  "buyer/markNotificationRead",
   async (notificationId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(`/notifications/mark-read/${notificationId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const getUnreadNotifications = createAsyncThunk(
-  'buyer/getUnreadNotifications',
+  "buyer/getUnreadNotifications",
   async (buyerId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/notifications/unread/${buyerId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 export const getBuyerNotifications = createAsyncThunk(
-  'buyer/getNotifications',
+  "buyer/getNotifications",
   async (buyerId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/notifications/${buyerId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -198,7 +235,7 @@ const initialState = {
 
 // ===================== SLICE ===================== //
 const buyerSlice = createSlice({
-  name: 'buyer',
+  name: "buyer",
   initialState,
   reducers: {
     clearBuyerError: (state) => {
@@ -206,7 +243,6 @@ const buyerSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // ✅ All addCase() come first
     builder
       .addCase(getBuyerOrders.fulfilled, (state, action) => {
         state.orders = action.payload;
@@ -225,7 +261,7 @@ const buyerSlice = createSlice({
       })
       .addCase(cancelBid.fulfilled, (state, action) => {
         state.bids = state.bids.map((b) =>
-          b.id === action.meta.arg ? { ...b, status: 'cancelled' } : b
+          b.id === action.meta.arg ? { ...b, status: "cancelled" } : b
         );
       })
       .addCase(addBuyerFeedback.fulfilled, (state, action) => {
@@ -253,11 +289,13 @@ const buyerSlice = createSlice({
       })
       .addCase(searchBuyerProduce.fulfilled, (state, action) => {
         state.produce = action.payload;
+      })
+      .addCase(updateBuyerProfile.fulfilled, (state, action) => {
+        state.profile = { ...state.profile, ...action.payload };
       });
 
-    // ✅ Matchers AFTER addCase()
     builder.addMatcher(
-      (action) => action.type.endsWith('/pending'),
+      (action) => action.type.endsWith("/pending"),
       (state) => {
         state.loading = true;
         state.error = null;
@@ -265,17 +303,17 @@ const buyerSlice = createSlice({
     );
 
     builder.addMatcher(
-      (action) => action.type.endsWith('/fulfilled'),
+      (action) => action.type.endsWith("/fulfilled"),
       (state) => {
         state.loading = false;
       }
     );
 
     builder.addMatcher(
-      (action) => action.type.endsWith('/rejected'),
+      (action) => action.type.endsWith("/rejected"),
       (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Operation failed';
+        state.error = action.payload || "Operation failed";
       }
     );
   },

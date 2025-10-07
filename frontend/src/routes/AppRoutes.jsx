@@ -4,9 +4,10 @@ import { store } from "../redux/store";
 import LandingPage from "../pages/LandingPage";
 import RegisterPage from "../pages/RegisterPage";
 import LoginPage from "../pages/LoginPage";
-import FarmerDashboard from "../pages/farmerDashboard";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import FarmerDashboard from "../pages/farmerDashboard";
+import BuyerDashboard from "../pages/BuyerDashboard";
 
 export default function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ export default function AppRoutes() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/farmer/dashboard" element={<FarmerDashboard />} />
+          <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
         </Routes>
 
         {/* Toast container placed globally */}

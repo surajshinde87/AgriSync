@@ -104,7 +104,7 @@ export default function FarmerDashboard() {
         toast.error("Failed to load profile");
       });
     }
-  }, []); // ✅ Runs once only
+  }, []); //  Runs once only
 
   // Fetch dashboard & other data once after profile loads
   useEffect(() => {
@@ -124,7 +124,7 @@ export default function FarmerDashboard() {
     dispatch(getFarmerBids(farmerId)).catch(() =>
       toast.error("Failed to load bids")
     );
-  }, [profile?.id]); // ✅ Runs once after profile loads
+  }, [profile?.id]); // Runs once after profile loads
 
   const refetchData = () => {
     if (profile?.id && userData?.id) {
