@@ -9,7 +9,11 @@ import com.agrisync.backend.enums.OrderStatus;
 import com.agrisync.backend.enums.PaymentStatus;
 import com.agrisync.backend.repository.OrderRepository;
 import com.agrisync.backend.repository.ProduceRepository;
+import com.agrisync.backend.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -124,18 +128,50 @@ public List<PaymentResponse> getRecentTransactions(Long buyerId) {
 }
 
 
-    private OrderResponse mapToResponse(Order order) {
-        return OrderResponse.builder()
-                .orderId(order.getId())
-                .produceId(order.getProduce().getId())
-                .buyerName("Buyer-" + order.getBuyerId()) // later fetch from BuyerProfile
-                .quantityKg(order.getQuantityKg())
-                .finalPricePerKg(order.getPricePerKg())
-                .totalAmount(order.getTotalAmount())
-                .status(order.getStatus().name())
-                .paymentStatus(order.getPaymentStatus().name())
-                .deliveryExpectedAt(order.getDeliveryExpectedAt())
-                .build();
-    }
+  private OrderResponse mapToResponse(Order order) {
+    Produce produce = order.getProduce();
+    FarmerProfile farmer = order.getFarmer();
+
+    return OrderResponse.builder()
+            .orderId(order.getId())
+            .produceId(produce.getId())
+            .produceName(produce.getCropType())
+            .cropType(produce.getCropType())
+
+            .farmerId(farmer.getId())
+            .farmerName(farmer.getUser().getFirstName() + " " + farmer.getUser().getLastName())
+            .farmerCity(farmer.getUser().getCity())
+
+            .buyerId(order.getBuyerId())
+            .buyerName(getBuyerName(order.getBuyerId())) // helper method
+            .buyerEmail(getBuyerEmail(order.getBuyerId()))
+
+            .quantityKg(order.getQuantityKg())
+            .pricePerKg(order.getPricePerKg())
+            .totalAmount(order.getTotalAmount())
+
+            .status(order.getStatus())
+            .paymentStatus(order.getPaymentStatus())
+
+            .deliveryExpectedAt(order.getDeliveryExpectedAt())
+            .createdAt(order.getCreatedAt())
+            .updatedAt(order.getUpdatedAt())
+            .build();
+}
+@Autowired
+private UserRepository userRepository;
+
+private String getBuyerName(Long buyerId) {
+    return userRepository.findById(buyerId)
+            .map(u -> u.getFirstName() + " " + u.getLastName())
+            .orElse("Unknown Buyer");
+}
+
+private String getBuyerEmail(Long buyerId) {
+    return userRepository.findById(buyerId)
+            .map(u -> u.getEmail())
+            .orElse("N/A");
+}
+
 }
 

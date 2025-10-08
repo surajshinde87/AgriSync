@@ -35,8 +35,11 @@ public class SecurityConfig {
                     "/h2-console/**"
                 ).permitAll()
 
-                // Farmer-only routes
+                
                 .requestMatchers("/api/farmer/**").hasRole("FARMER")
+                .requestMatchers("/api/buyer/**").hasRole("BUYER")
+                .requestMatchers("/api/driver/**").hasRole("DRIVER")
+
 
                 // Any other endpoints must be authenticated
                 .anyRequest().authenticated()

@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                System.out.println("Authenticated user: " + email + " | Role: " + role);
+       
             } else {
                 System.out.println(" Invalid JWT Token");
             }

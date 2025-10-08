@@ -52,6 +52,7 @@ public class BuyerProfileService {
 
     private BuyerProfileResponse mapToResponse(User user, BuyerProfile profile) {
         return BuyerProfileResponse.builder()
+                .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())

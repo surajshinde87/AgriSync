@@ -7,11 +7,8 @@ import com.agrisync.backend.dto.farmer.FarmerProfileResponse;
 import com.agrisync.backend.dto.farmer.TopCropResponse;
 import com.agrisync.backend.dto.order.OrderResponse;
 import com.agrisync.backend.dto.produce.ProduceResponse;
-import com.agrisync.backend.dto.transaction.PaymentResponse;
-import com.agrisync.backend.dto.feedback.FeedbackResponse;
 import com.agrisync.backend.entity.*;
 import com.agrisync.backend.repository.*;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +16,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Collections;
+import java.util.Comparator;
 @Service
 @RequiredArgsConstructor
 public class FarmerDashboardService {
@@ -29,11 +30,11 @@ public class FarmerDashboardService {
     private final OrderRepository orderRepository;
     private final BidRepository bidRepository;
     private final FeedbackRepository feedbackRepository;
-    private final UserRepository userRepository; // ✅ Add this line
+    private final UserRepository userRepository;
 
     public FarmerDashboardResponse getDashboard(Long userId) {
 
-        // ✅ FIXED: Find farmer profile using userId
+        // 1. Fetch Farmer Profile
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -41,13 +42,13 @@ public class FarmerDashboardService {
                 .orElseThrow(() -> new RuntimeException("Farmer not found"));
 
         FarmerProfileResponse profileDto = FarmerProfileResponse.builder()
-                .firstName(farmerProfile.getUser().getFirstName())
-                .lastName(farmerProfile.getUser().getLastName())
-                .email(farmerProfile.getUser().getEmail())
-                .city(farmerProfile.getUser().getCity())
-                .state(farmerProfile.getUser().getState())
-                .pincode(farmerProfile.getUser().getPincode())
-                .role(farmerProfile.getUser().getRole())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .city(user.getCity())
+                .state(user.getState())
+                .pincode(user.getPincode())
+                .role(user.getRole())
                 .profileImageUrl(farmerProfile.getProfileImageUrl())
                 .bankAccountNumber(farmerProfile.getBankAccountNumber())
                 .ifscCode(farmerProfile.getIfscCode())
@@ -57,15 +58,16 @@ public class FarmerDashboardService {
                 .farmLocation(farmerProfile.getFarmLocation())
                 .build();
 
-        Long farmerProfileId = farmerProfile.getId(); // ✅ use profileId for internal queries
+        Long farmerProfileId = farmerProfile.getId();
 
-        // Orders and produces
+        // 2. Fetch Orders and Produces
         List<Order> orders = Optional.ofNullable(orderRepository.findByFarmer_Id(farmerProfileId))
                 .orElse(Collections.emptyList());
+
         List<Produce> produces = Optional.ofNullable(produceRepository.findByFarmer_IdAndActiveTrue(farmerProfileId))
                 .orElse(Collections.emptyList());
 
-        // Summary calculations
+        // 3. Summary Calculations
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         LocalDateTime days30 = now.minusDays(30);
 
@@ -102,7 +104,7 @@ public class FarmerDashboardService {
                 .pendingPayments(pendingPayments)
                 .build();
 
-        // Top crops
+        // 4. Top Crops
         Map<String, Double> revenueByCrop = orders.stream()
                 .filter(o -> o.getProduce() != null && o.getTotalAmount() != null)
                 .collect(Collectors.groupingBy(
@@ -127,7 +129,7 @@ public class FarmerDashboardService {
                 .limit(5)
                 .collect(Collectors.toList());
 
-        // Produce list
+        // 5. Produce List
         List<ProduceResponse> produceList = produces.stream()
                 .map(p -> ProduceResponse.builder()
                         .id(p.getId())
@@ -143,8 +145,9 @@ public class FarmerDashboardService {
                         .build())
                 .collect(Collectors.toList());
 
-        // Active bids
-        List<Bid> activeBidsEntities = Optional.ofNullable(bidRepository.findByProduce_Farmer_IdAndActiveTrue(farmerProfileId))
+        // 6. Active Bids
+        List<Bid> activeBidsEntities = Optional.ofNullable(
+                bidRepository.findByProduce_Farmer_IdAndActiveTrue(farmerProfileId))
                 .orElse(Collections.emptyList());
 
         List<BidResponse> activeBids = activeBidsEntities.stream()
@@ -160,22 +163,46 @@ public class FarmerDashboardService {
                         .build())
                 .collect(Collectors.toList());
 
-        // Orders DTO
+        // 7. Orders DTO Mapping
         List<OrderResponse> ordersDto = orders.stream()
-                .map(o -> OrderResponse.builder()
-                        .orderId(o.getId())
-                        .produceId(o.getProduce() != null ? o.getProduce().getId() : null)
-                        .buyerName("Buyer-" + (o.getBuyerId() != null ? o.getBuyerId() : "N/A"))
-                        .quantityKg(o.getQuantityKg())
-                        .finalPricePerKg(o.getPricePerKg())
-                        .totalAmount(o.getTotalAmount())
-                        .status(o.getStatus() != null ? o.getStatus().name() : "UNKNOWN")
-                        .paymentStatus(o.getPaymentStatus() != null ? o.getPaymentStatus().name() : "UNKNOWN")
-                        .deliveryExpectedAt(o.getDeliveryExpectedAt())
-                        .build())
-                .collect(Collectors.toList());
+        .map((Order o) -> {
+            Produce produce = o.getProduce();
+            FarmerProfile farmer = o.getFarmer();
 
-        // Final payload
+            return OrderResponse.builder()
+                    .orderId(o.getId())
+                    .produceId(produce != null ? produce.getId() : null)
+                    .produceName(produce != null ? produce.getCropType() : "Unknown Produce")
+                    .cropType(produce != null ? produce.getCropType() : "N/A")
+
+                    .farmerId(farmer != null ? farmer.getId() : null)
+                    .farmerName(farmer != null && farmer.getUser() != null
+                            ? farmer.getUser().getFirstName() + " " + farmer.getUser().getLastName()
+                            : "Unknown Farmer")
+                    .farmerCity(farmer != null && farmer.getUser() != null
+                            ? farmer.getUser().getCity()
+                            : "N/A")
+
+                    .buyerId(o.getBuyerId())
+                    .buyerName("Buyer-" + (o.getBuyerId() != null ? o.getBuyerId() : "N/A"))
+                    .buyerEmail(getBuyerEmail(o.getBuyerId()))
+
+                    .quantityKg(o.getQuantityKg())
+                    .pricePerKg(o.getPricePerKg())
+                    .totalAmount(o.getTotalAmount())
+
+                    .status(o.getStatus())
+                    .paymentStatus(o.getPaymentStatus())
+
+                    .deliveryExpectedAt(o.getDeliveryExpectedAt())
+                    .createdAt(o.getCreatedAt())
+                    .updatedAt(o.getUpdatedAt())
+                    .build();
+        })
+        .collect(Collectors.toList());
+
+
+        // 8. Final Dashboard Response
         return FarmerDashboardResponse.builder()
                 .profile(profileDto)
                 .summary(summary)
@@ -184,5 +211,13 @@ public class FarmerDashboardService {
                 .activeBids(activeBids)
                 .orders(ordersDto)
                 .build();
+    }
+
+    // Helper method (outside getDashboard)
+    private String getBuyerEmail(Long buyerId) {
+        if (buyerId == null) return "N/A";
+        return userRepository.findById(buyerId)
+                .map(User::getEmail)
+                .orElse("N/A");
     }
 }
