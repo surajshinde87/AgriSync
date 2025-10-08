@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -194,9 +194,9 @@ export default function LoginPage() {
           transition={{ duration: 0.6 }}
         >
           <FaLeaf className="text-5xl text-green-400 animate-pulse" />
-          <span className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-teal-400 to-blue-400">
+          <Link to={"/"} className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-teal-400 to-blue-400">
             AgriSync
-          </span>
+          </Link>
         </motion.div>
 
         {/* Card */}

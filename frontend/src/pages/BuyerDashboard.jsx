@@ -1635,7 +1635,7 @@ export default function BuyerDashboard() {
                 <button
                   type="button"
                   onClick={handleSubmitFeedback}
-                  className="flex-1 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold"
+                  className="flex justify-center items-center gap-2.5 flex-1 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold"
                 >
                   <FaStar /> Submit
                 </button>

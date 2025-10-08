@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FarmerDashboard from "../pages/farmerDashboard";
 import BuyerDashboard from "../pages/BuyerDashboard";
+import DriverDashboard from "../pages/DriverDashboard";
 
 export default function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/farmer/dashboard" element={<FarmerDashboard />} />
           <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
+          <Route path="/driver/dashboard" element={<DriverDashboard />} />
         </Routes>
 
         {/* Toast container placed globally */}
